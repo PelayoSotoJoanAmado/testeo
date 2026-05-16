@@ -1,0 +1,186 @@
+$primary-color: #3836b6;
+$secondary-color: #55c77b;
+$back-color: #86e6a6;
+$third-color: rgb(255, 142, 255);
+
+$font-size-base: 14px;
+$border-radius-base: 2px;
+
+$padding: 10px;
+$margin: 10px;
+$gap: 10px;
+
+@mixin contenedor($g) {
+    padding: $padding;
+    margin: $margin;
+    gap: $g;
+    display: flex;
+    flex-direction: column;
+    background-color: $back-color;
+}
+
+//BOth this one and @mixin ↑ are valid, one function, other class
+//But one requires @include ↑ and the other @extend ↓
+//u could use %contenedor, to avoid creating unnecessary classes
+.contenedor {
+    padding: $padding;
+    margin: $margin;
+    gap: $gap;
+    display: flex;
+    flex-direction: column;
+    background-color: $back-color;
+}
+
+.container {
+    @include contenedor(20px);
+    // @extend .contenedor;
+
+
+}
+
+@mixin color-texto($fondo) {
+    @if lightness($fondo)>50% {
+        color: #000;
+    }
+
+    @else {
+        color: #fff;
+    }
+}
+
+
+@for $i from 1 through 5 {
+    .alerta-#{$i} {
+        $fondo-alerta: darken($primary-color, 8% + (4 * $i));
+        background-color: $fondo-alerta;
+        font-size: $font-size-base + ($i * 4px);
+        // color: lighten($secondary-color, 10% + (8 * $i));
+        padding: $padding * $i;
+        @include color-texto($fondo-alerta);
+    }
+}
+
+
+// 1. Definimos una lista con los colores que queremos usar
+$colores: #ff5733, #33ff57, #3357ff, #f3ff33, #ff33f6;
+
+.item {
+    @include contenedor(1rem);
+
+    article {
+        background-color: #f1d248;
+        padding: $padding;
+        //Se puede colocar aca el @for ↓, pero se remplaza el article con &, es decir lo del padre
+    }
+
+    // Cada hijo más pequeño que el anterior
+    @for $i from 1 through 5 {
+        article:nth-child(#{$i}) {
+            width: 200px - ($i * 20px);
+            //  hijo 1 → 180px
+            //  hijo 2 → 160px
+            //  hijo 3 → 140px ...
+            background-color: nth($colores, $i);
+
+        }
+    }
+
+
+
+    // 2. El bucle corre desde el 1 hasta el total de colores (4)
+    // @for $i from 1 through length($colores) {
+
+    //     // 3. Usamos #{$i} para insertar el número dinámicamente en el nth-child
+    //     article:nth-child(#{$i}) {
+    //         // 4. Extraemos el color correspondiente de la lista usando su posición
+    //         background-color: nth($colores, $i);
+    //         color: rgb(14, 54, 48);
+    //         padding: 10px;
+    //         margin-bottom: 5px;
+    //     }
+    // }
+    // All of this can be replaced with background-color: nth($colores, $i);
+
+}
+
+
+
+
+
+$i: 1;
+
+@while $i <=4 {
+    .espaciado-#{$i} {
+        margin-bottom: 5px * $i;
+        padding-left: 10px * $i;
+    }
+
+    $i: $i + 1;
+}
+
+
+$breakpoint-mobile: 600px;
+
+@media (max-width: $breakpoint-mobile) {
+
+    @for $i from 1 through 5 {
+        .alerta-#{$i} {
+            font-size: $font-size-base;
+            padding: $padding;
+        }
+    }
+
+}
+
+
+
+
+$colores: (
+    "primario": #007bff,
+    "exito": #28a745,
+    "peligro": #dc3545
+);
+
+@each $nombre, $color in $colores {
+    .btn-#{$nombre} {
+        background: $color;
+        border: 2px solid darken($color, 10%);
+        color: white;
+    }
+}
+
+
+
+
+
+// Mixin que recibe cuántos hijos quieres afectar
+@mixin estilo-hijos($n, $color-base) {
+    @for $i from 1 through $n {
+        &:nth-child(#{$i}) {
+            background: darken($color-base, $i * 10%);
+            font-size: 14px + $i * 2;
+            transition-delay: $i * 0.15s;
+        }
+    }
+}
+
+
+aside {
+    div {
+        @include estilo-hijos(6, $third-color)
+    }
+}
+
+
+
+$items: red, green, blue, yellow, purple;
+
+footer {
+    @each $color in $items {
+        $i: index($items, $color); // index() da la posición
+
+        div:nth-child(#{$i}) {
+            background: $color;
+        }
+    }
+}
